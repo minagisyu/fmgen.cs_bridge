@@ -11,12 +11,12 @@ Copyright (C) by cisc 1998, 2003.
 
 ## このフォークについて
 
-- [kichikuou氏のリポジトリ](https://github.com/kichikuou/fmgen)ベース
-- CMake で共有ライブラリを作るように変更
-- セグメンテーションフォルトを引き起こす可能性のある箇所を修正
-  - OPNB::ch[6] をコメントアウト (OPNABase で既に定義されている)
-- ブリッジインターフェイス( C 関数エクスポート)を追加
-- ブリッジインターフェイス呼び出しテストプログラム追加
+- https://github.com/minagisyu/fmgen ベース
+- ネイティブライブラリビルド時に .NET RID に基づいたディレクトリに出力
+- C# ブリッジインターフェイスを追加
+- ネイティブライブラリ同梱のNuGetパッケージを出力
+- ブリッジインターフェイス呼び出しテストスクリプトを追加
+- GitHub Actions による CI/CD を追加
 
 ### ビルドについて
 ```
@@ -28,5 +28,4 @@ cmake --build . --config Release
 
 ### ライセンスについて
 - fmgen に関しては readme-fmgen.txt に記載のライセンスに準じます
-- フォーク元のコードに関してはそのライセンスに準じます
 - このフォークオリジナルの部分に関しては[WTFPL](https://www.wtfpl.net/)とします
