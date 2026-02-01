@@ -1,0 +1,174 @@
+# CI/CD ワークフロー: PR/push でビルド・テスト・pack、タグ v* で公開
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [cs_bridge]
+  push:
+    branches: [cs_bridge]
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.x'
+
+jobs:
+  # ビルド: 全プラットフォームのネイティブライブラリ
+  build-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, rid: win-x64,     cmake-args: '-A x64' }
+          - { os: windows-latest, rid: win-arm64,   cmake-args: '-A ARM64' }
+          - { os: macos-14,       rid: osx-x64,     cmake-args: '-DCMAKE_OSX_ARCHITECTURES=x86_64' }
+          - { os: macos-14,       rid: osx-arm64,   cmake-args: '' }
+          - { os: ubuntu-latest,  rid: linux-x64,   cmake-args: '' }
+          - { os: ubuntu-latest,  rid: linux-arm64, cmake-args: '-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++', cross: aarch64 }
+          - { os: ubuntu-latest,  rid: linux-arm,   cmake-args: '-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=arm -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++', cross: arm }
+
+    runs-on: ${{ matrix.os }}
+    name: Native (${{ matrix.rid }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cross toolchain
+        if: matrix.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-${{ matrix.cross }}-linux-gnu${{ matrix.cross == 'arm' && 'eabihf' || '' }} g++-${{ matrix.cross }}-linux-gnu${{ matrix.cross == 'arm' && 'eabihf' || '' }}
+
+      - name: Configure & Build
+        shell: bash
+        run: |
+          CMAKE_OPTS="${{ matrix.cmake-args }} -DDOTNET_RID=${{ matrix.rid }}"
+          [[ "${{ runner.os }}" != "Windows" ]] && CMAKE_OPTS="-DCMAKE_BUILD_TYPE=Release $CMAKE_OPTS"
+          cmake -B build $CMAKE_OPTS
+          cmake --build build --config Release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: runtimes/${{ matrix.rid }}/native/
+          if-no-files-found: error
+
+  # テスト: 実行可能なプラットフォームのみ
+  test:
+    needs: build-native
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, rid: win-x64 }
+          - { os: ubuntu-latest,  rid: linux-x64 }
+          - { os: macos-14,       rid: osx-x64,   arch: x86_64 }
+          - { os: macos-14,       rid: osx-arm64 }
+
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.rid }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup .NET x64 for Rosetta
+        if: matrix.arch == 'x86_64'
+        shell: bash
+        run: |
+          softwareupdate --install-rosetta --agree-to-license || true
+          curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 10.0 --architecture x64 --install-dir "$HOME/.dotnet-x64"
+          echo "$HOME/.dotnet-x64" >> $GITHUB_PATH
+          echo "DOTNET_ROOT=$HOME/.dotnet-x64" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: runtimes/${{ matrix.rid }}/native
+
+      - name: Test
+        shell: bash
+        run: |
+          ${{ matrix.arch == 'x86_64' && 'arch -x86_64' || '' }} dotnet test -c Release
+
+  # パック: 全 runtimes を集約して NuGet パッケージ作成
+  pack:
+    needs: [build-native, test]
+    runs-on: ubuntu-latest
+    name: Pack
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Merge runtimes & Create zips
+        run: |
+          mkdir -p out
+          for dir in artifacts/native-*/; do
+            rid=${dir#artifacts/native-}; rid=${rid%/}
+            mkdir -p "runtimes/$rid/native"
+            cp -r "$dir"* "runtimes/$rid/native/"
+            (cd "runtimes/$rid/native" && zip -r "../../../out/fmgen-native-${rid}.zip" .)
+          done
+          find runtimes -type f
+          ls -la out/
+
+      - name: Build & Pack
+        run: |
+          VERSION_ARG=""
+          [[ "${GITHUB_REF}" == refs/tags/v* ]] && VERSION_ARG="-p:Version=${GITHUB_REF_NAME#v}"
+          dotnet build cs_bridge/fmgen.cs_bridge.csproj -c Release $VERSION_ARG
+          dotnet pack cs_bridge/fmgen.cs_bridge.csproj -c Release -o out --no-build $VERSION_ARG
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: out/*
+          if-no-files-found: error
+
+  # 公開: タグ v* のときのみ
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: pack
+    runs-on: ubuntu-latest
+    name: Publish
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: out
+
+      - name: List release assets
+        run: ls -la out/
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/*.nupkg
+            out/*.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - run: dotnet nuget push out/*.nupkg --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --api-key ${{ secrets.ACTIONS_SECRET }} --skip-duplicate

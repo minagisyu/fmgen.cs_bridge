@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11426.168 d18.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fmgen.cs_bridge.test", "cs_bridge.test\fmgen.cs_bridge.test.csproj", "{4FA4197C-800C-42E1-BA58-C5E594899B61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fmgen.cs_bridge", "cs_bridge\fmgen.cs_bridge.csproj", "{4DC12D94-0A1C-3F56-E1FC-C1124A845BEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4FA4197C-800C-42E1-BA58-C5E594899B61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FA4197C-800C-42E1-BA58-C5E594899B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FA4197C-800C-42E1-BA58-C5E594899B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FA4197C-800C-42E1-BA58-C5E594899B61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DC12D94-0A1C-3F56-E1FC-C1124A845BEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DC12D94-0A1C-3F56-E1FC-C1124A845BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DC12D94-0A1C-3F56-E1FC-C1124A845BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DC12D94-0A1C-3F56-E1FC-C1124A845BEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {44247DB4-3ADF-4206-B94F-BD003F813E8A}
+	EndGlobalSection
+EndGlobal

@@ -26,6 +26,9 @@ cmake ../
 cmake --build . --config Release
 ```
 
+ビルド成果物は `runtimes/<rid>/native/` に出力されます（例: `runtimes/win-x64/native/fmgen.dll`）。  
+RID は自動判定されますが、`-DDOTNET_RID=...` で明示的に指定することも可能です。
+
 ### ライセンスについて
 - fmgen に関しては readme-fmgen.txt に記載のライセンスに準じます
 - このフォークオリジナルの部分に関しては[WTFPL](https://www.wtfpl.net/)とします

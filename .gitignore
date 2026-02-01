@@ -421,3 +421,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /sample/s98sample/*.wav
+
+# .NET RID-based native library output
+runtimes/

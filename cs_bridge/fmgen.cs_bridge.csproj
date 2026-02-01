@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>fmgen.cs_bridge</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>0.8.16</Version>
+    <Title>$(AssemblyName)</Title>
+    <PackageId>$(AssemblyName)</PackageId>
+    <Copyright>$(AssemblyName)</Copyright>
+    <Description>C# bridge interface for fmgen.</Description>
+    <RepositoryUrl>https://github.com/minagisyu/fmgen.cs_bridge</RepositoryUrl>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+    <IsTrimmable>True</IsTrimmable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+    <IsTrimmable>True</IsTrimmable>
+  </PropertyGroup>
+
+  <!-- readme.md と LICENSE ファイルを同梱 -->
+  <ItemGroup>
+    <None Include="readme.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE-fmgen" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE-WTFPL" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- NuGet パッケージにネイティブバイナリを同梱 -->
+  <ItemGroup>
+    <Content Include="..\runtimes\**" Condition="Exists('..\runtimes')">
+      <Pack>true</Pack>
+      <PackagePath>runtimes</PackagePath>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+
+</Project>
