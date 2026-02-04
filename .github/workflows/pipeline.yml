@@ -2,17 +2,14 @@
 name: CI/CD
 
 on:
-  pull_request:
-    branches: [cs_bridge]
   push:
-    branches: [cs_bridge]
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
   contents: read
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: "10.0.x"
 
 jobs:
   # ビルド: 全プラットフォームのネイティブライブラリ
@@ -21,13 +18,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: windows-latest, rid: win-x64,     cmake-args: '-A x64' }
-          - { os: windows-latest, rid: win-arm64,   cmake-args: '-A ARM64' }
-          - { os: macos-14,       rid: osx-x64,     cmake-args: '-DCMAKE_OSX_ARCHITECTURES=x86_64' }
-          - { os: macos-14,       rid: osx-arm64,   cmake-args: '' }
-          - { os: ubuntu-latest,  rid: linux-x64,   cmake-args: '' }
-          - { os: ubuntu-latest,  rid: linux-arm64, cmake-args: '-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++', cross: aarch64 }
-          - { os: ubuntu-latest,  rid: linux-arm,   cmake-args: '-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=arm -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++', cross: arm }
+          - { os: windows-latest, rid: win-x64, cmake-args: "-A x64" }
+          - { os: windows-latest, rid: win-arm64, cmake-args: "-A ARM64" }
+          - {
+              os: macos-14,
+              rid: osx-x64,
+              cmake-args: "-DCMAKE_OSX_ARCHITECTURES=x86_64",
+            }
+          - { os: macos-14, rid: osx-arm64, cmake-args: "" }
+          - { os: ubuntu-latest, rid: linux-x64, cmake-args: "" }
+          - {
+              os: ubuntu-latest,
+              rid: linux-arm64,
+              cmake-args: "-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++",
+              cross: aarch64,
+            }
+          - {
+              os: ubuntu-latest,
+              rid: linux-arm,
+              cmake-args: "-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=arm -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++",
+              cross: arm,
+            }
 
     runs-on: ${{ matrix.os }}
     name: Native (${{ matrix.rid }})
@@ -63,9 +74,9 @@ jobs:
       matrix:
         include:
           - { os: windows-latest, rid: win-x64 }
-          - { os: ubuntu-latest,  rid: linux-x64 }
-          - { os: macos-14,       rid: osx-x64,   arch: x86_64 }
-          - { os: macos-14,       rid: osx-arm64 }
+          - { os: ubuntu-latest, rid: linux-x64 }
+          - { os: macos-14, rid: osx-x64, arch: x86_64 }
+          - { os: macos-14, rid: osx-arm64 }
 
     runs-on: ${{ matrix.os }}
     name: Test (${{ matrix.rid }})

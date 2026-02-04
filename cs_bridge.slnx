@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="cs_bridge.test/fmgen.cs_bridge.test.csproj" />
+  <Project Path="cs_bridge/fmgen.cs_bridge.csproj" />
+</Solution>

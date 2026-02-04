@@ -1,5 +1,4 @@
 # FM Sound Generator with OPN/OPM interface
-
 ```
 C++ による FM/PSG 音源の実装です。
 AY8910, YM2203, YM2151, YM2608, YM2610 相当のインターフェースも実装してあります。
@@ -10,7 +9,6 @@ Copyright (C) by cisc 1998, 2003.
 ```
 
 ## このフォークについて
-
 - https://github.com/minagisyu/fmgen ベース
 - ネイティブライブラリビルド時に .NET RID に基づいたディレクトリに出力
 - C# ブリッジインターフェイスを追加
@@ -18,7 +16,7 @@ Copyright (C) by cisc 1998, 2003.
 - ブリッジインターフェイス呼び出しテストスクリプトを追加
 - GitHub Actions による CI/CD を追加
 
-### ビルドについて
+## ビルドについて
 ```
 mkdir build
 cd build 
@@ -29,6 +27,6 @@ cmake --build . --config Release
 ビルド成果物は `runtimes/<rid>/native/` に出力されます（例: `runtimes/win-x64/native/fmgen.dll`）。  
 RID は自動判定されますが、`-DDOTNET_RID=...` で明示的に指定することも可能です。
 
-### ライセンスについて
+## ライセンスについて
 - fmgen に関しては readme-fmgen.txt に記載のライセンスに準じます
 - このフォークオリジナルの部分に関しては[WTFPL](https://www.wtfpl.net/)とします
