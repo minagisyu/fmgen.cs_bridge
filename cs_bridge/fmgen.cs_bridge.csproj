@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>0.8.18</Version>
+    <Version>0.8.19</Version>
     <Title>$(AssemblyName)</Title>
     <PackageId>$(AssemblyName)</PackageId>
     <Copyright>$(AssemblyName)</Copyright>
@@ -26,14 +26,13 @@
     <IsTrimmable>True</IsTrimmable>
   </PropertyGroup>
 
-  <!-- readme.md と LICENSE ファイルを同梱 -->
   <ItemGroup>
     <None Include="readme.md" Pack="true" PackagePath="\" />
+    <None Include="..\readme-fmgen.txt" Pack="true" PackagePath="\" />
     <None Include="..\LICENSE-fmgen" Pack="true" PackagePath="\" />
     <None Include="..\LICENSE-WTFPL" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <!-- NuGet パッケージにネイティブバイナリを同梱 -->
   <ItemGroup>
     <Content Include="..\runtimes\**" Condition="Exists('..\runtimes')">
       <Pack>true</Pack>
