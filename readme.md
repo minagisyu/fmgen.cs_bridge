@@ -16,6 +16,15 @@ Copyright (C) by cisc 1998, 2003.
 - ブリッジインターフェイス呼び出しテストスクリプトを追加
 - GitHub Actions による CI/CD を追加
 
+![](https://img.shields.io/nuget/v/fmgen.cs_bridge.svg)
+```
+// dotnet CLI
+dotnet add package fmgen.cs_bridge
+
+// .csproj
+<PackageReference Include="fmgen.cs_bridge" Version="0.8.*" />
+```
+
 ## ビルドについて
 ```
 mkdir build
