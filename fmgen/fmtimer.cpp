@@ -8,6 +8,15 @@
 
 using namespace FM;
 
+Timer::Timer()
+{
+    timer_step = 0;
+    timera = timerb = 0;
+    regtc = 0;
+    regta[0] = regta[1] = 0;
+    timera_count = timerb_count = 0;
+}
+
 // ---------------------------------------------------------------------------
 //  タイマー制御
 //

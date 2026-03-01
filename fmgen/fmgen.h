@@ -260,6 +260,17 @@ namespace FM
         OpType  optype_;
         uint32  multable_[4][16];
     };
-}
+
+    class Xorshift32
+    {
+    private:
+        static uint32 state_;
+
+    public:
+        static void ResetSeed(uint32 seed);
+        static uint Next();
+        static uint Next(uint max);
+    };
+}  // namespace FM
 
 #endif // FM_GEN_H

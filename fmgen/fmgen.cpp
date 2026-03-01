@@ -301,6 +301,14 @@ FM::Operator::Operator()
     ms_ = 0;
 
 //  Reset();
+
+    // Zero Clear
+    tl_ = tl_latch_ = 0;
+    eg_count_ = 0;
+    eg_curve_count_ = 0;
+    ssg_phase_ = 0;
+    pg_count_ = 0;
+    out_ = out2_ = 0;
 }
 
 //  初期化
@@ -706,6 +714,7 @@ bool Channel4::tablehasmade = false;
 
 Channel4::Channel4()
 {
+    fb = 0;
     if (!tablehasmade)
         MakeTable();
 
@@ -814,7 +823,7 @@ void Channel4::SetAlgorithm(uint algo)
 //  合成
 ISample Channel4::Calc()
 {
-    int r;
+    int r = 0;
     switch (algo_)
     {
     case 0:
@@ -874,7 +883,7 @@ ISample Channel4::CalcL()
 {
     chip_->SetPMV(pms[chip_->GetPML()]);
 
-    int r;
+    int r = 0;
     switch (algo_)
     {
     case 0:
@@ -954,6 +963,18 @@ ISample Channel4::CalcLN(uint noise)
     int o = op[3].out_;
     op[3].CalcN(noise);
     return *out[2] + o;
+}
+
+uint32 Xorshift32::state_ = 42;
+void Xorshift32::ResetSeed(uint32 seed){ state_ = seed; }
+uint Xorshift32::Next(uint max) { return Next() % max; }
+uint Xorshift32::Next()
+{  
+    uint32 x = state_;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    return state_ = x;
 }
 
 }   // namespace FM

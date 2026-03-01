@@ -363,7 +363,7 @@ namespace FM
 
         static int jedi_table[(48+1)*16];
 
-    //    Channel4 ch[6];
+    //  Channel4 ch[6];
     };
 
     //  YM2612/3438(OPN2) ----------------------------------------------------

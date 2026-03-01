@@ -14,6 +14,8 @@
 //
 PSG::PSG()
 {
+    scount[0] = scount[1] = scount[2] = 0;
+    ncount = 0;
     SetVolume(0);
     MakeNoiseTable();
     Reset();

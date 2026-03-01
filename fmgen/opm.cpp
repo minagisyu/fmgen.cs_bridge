@@ -4,7 +4,6 @@
 // ---------------------------------------------------------------------------
 //  $Id: opm.cpp,v 1.26 2003/08/25 13:53:08 cisc Exp $
 
-#include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include "common/misc.h"
@@ -24,6 +23,8 @@ OPM::OPM()
 {
     lfo_count_ = 0;
     lfo_count_prev_ = ~0;
+    lfo_step_ = 0;
+    Xorshift32::ResetSeed(42);
     BuildLFOTable();
     for (int i=0; i<8; i++)
     {
@@ -83,6 +84,7 @@ void OPM::Reset()
     status = 0;
     noise = 12345;
     noisecount = 0;
+    Xorshift32::ResetSeed(42);
 
     for (i=0; i<8; i++)
         ch[i].Reset();
@@ -349,7 +351,7 @@ void OPM::BuildLFOTable()
 
             case 3:
                 if (!(c & 3))
-                    r = (rand() / 17) & 0xff;
+                r = (Xorshift32::Next() >> 24) & 0xff;
                 a = r;
                 p = r - 0x80;
                 break;
@@ -380,7 +382,7 @@ inline void OPM::LFO()
     {
         if ((lfo_count_ ^ lfo_count_prev_) & ~((1 << 17) - 1))
         {
-            int c = (rand() / 17) & 0xff;
+            int c = (Xorshift32::Next() >> 24) & 0xff;
             chip.SetPML((c - 0x80) * pmd / 128 + 0x80);
             chip.SetAML(c * amd / 128);
         }

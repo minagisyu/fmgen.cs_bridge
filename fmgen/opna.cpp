@@ -380,12 +380,14 @@ bool OPNABase::tablehasmade = false;
 OPNABase::OPNABase()
 {
     adpcmbuf = 0;
+    adpcmreadbuf = 0;
     memaddr = 0;
     startaddr = 0;
     deltan = 256;
 
     adpcmvol = 0;
     control2 = 0;
+    reg22 = 0;
 
     MakeTable2();
     BuildLFOTable();
@@ -459,6 +461,7 @@ void OPNABase::Reset()
     adpcmplay = false;
     adplc = 0;
     adpld = 0x100;
+    adpcmout = apout0 = apout1 = 0;
     status = 0;
     UpdateStatus();
 }
