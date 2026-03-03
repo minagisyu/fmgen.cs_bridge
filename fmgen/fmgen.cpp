@@ -300,7 +300,7 @@ FM::Operator::Operator()
     // LFO
     ms_ = 0;
 
-//  Reset();
+//  Reset();  // chip_ が nullptr のためコンストラクタ時点では呼べない
 
     // Zero Clear
     tl_ = tl_latch_ = 0;
@@ -309,6 +309,26 @@ FM::Operator::Operator()
     ssg_phase_ = 0;
     pg_count_ = 0;
     out_ = out2_ = 0;
+    in2_ = 0;
+
+    // EG: Reset() → ShiftPhase(off) / SetEGRate(0) / EGUpdate() で設定される変数
+    // chip_ が nullptr のため SetEGRate / EGUpdate は呼べないので個別に初期化
+    eg_phase_              = off;
+    eg_level_              = FM_EG_BOTTOM;
+    eg_level_on_next_phase_= FM_EG_BOTTOM;
+    eg_out_                = 0;
+    eg_rate_               = 0;
+    eg_count_diff_         = 0;
+    ssg_offset_            = 0;
+    ssg_vector_            = 1;  // 乗算係数のため 0 ではなく 1 で初期化
+
+    // PG: Prepare() で設定される変数
+    pg_diff_               = 0;
+    pg_diff_lfo_           = 0;
+    bn_                    = 0;
+
+    // param_changed_ が未初期化だと Prepare() 内の更新がスキップされる可能性があるため true で初期化
+    param_changed_         = true;
 }
 
 //  初期化

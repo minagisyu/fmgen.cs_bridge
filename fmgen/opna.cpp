@@ -389,6 +389,20 @@ OPNABase::OPNABase()
     control2 = 0;
     reg22 = 0;
 
+    // Reset() で設定される変数を先に初期化（Init() 前に参照されると UB になるため）
+    adpcmd    = 127;
+    adpcmx    = 0;
+    lfocount  = 0;
+    lfodcount = 0;
+    adpcmplay = false;
+    adplc     = 0;
+    adpld     = 0x100;
+    adpcmout  = 0;
+    apout0    = 0;
+    apout1    = 0;
+    stmask    = ~0x1c;
+    statusnext= 0;
+
     MakeTable2();
     BuildLFOTable();
     for (int i=0; i<6; i++)
@@ -1167,6 +1181,7 @@ OPNA::OPNA()
         rhythm[i].size = 0;
         rhythm[i].volume = 0;
     }
+    rhythmtl   = 0;
     rhythmtvol = 0;
     adpcmmask = 0x3ffff;
     adpcmnotice = 4;
@@ -1270,7 +1285,9 @@ bool OPNA::LoadRhythmSample(const char* path)
                 break;
             if (path)
                 strncpy(buf, path, sizeof(buf));
-            strncpy(buf, "2608_RYM.WAV", sizeof(buf));
+            else
+                buf[0] = '\0';
+            strncat(buf, "2608_RYM.WAV", sizeof(buf) - strlen(buf) - 1);
             fp = fopen(buf, "rb");
             if (!fp)
                 break;
@@ -1292,13 +1309,18 @@ bool OPNA::LoadRhythmSample(const char* path)
         fread(&whdr, sizeof(whdr), 1, fp);
 
         uint8 subchunkname[4];
-        fsize = 4 + whdr.chunksize - sizeof(whdr);
-        do
         {
-            fseek(fp, fsize, SEEK_CUR);
-            fread(&subchunkname, 4, 1, fp);
-            fread(&fsize, 4, 1, fp);
-        } while (memcmp("data", subchunkname, 4));
+            // LP64 (GCC 64-bit) では uint32 が long へゼロ拡張されるため、
+            // 負になりうるシークオフセットは符号付き型で保持する必要がある。
+            int32 skip = (int32)((int32)4 + (int32)whdr.chunksize - (int32)sizeof(whdr));
+            do
+            {
+                fseek(fp, (long)skip, SEEK_CUR);
+                fread(&subchunkname, 4, 1, fp);
+                fread(&fsize, 4, 1, fp);
+                skip = (int32)fsize;
+            } while (memcmp("data", subchunkname, 4));
+        }
 
         fsize /= 2;
         if (fsize >= 0x100000 || whdr.tag != 1 || whdr.nch != 1) {
@@ -1307,7 +1329,7 @@ bool OPNA::LoadRhythmSample(const char* path)
         }
     //    fsize = Max(fsize, (1<<31)/1024);
 
-        delete rhythm[i].sample;
+        delete[] rhythm[i].sample;
         rhythm[i].sample = new int16[fsize];
         if (!rhythm[i].sample) {
             fclose(fp);

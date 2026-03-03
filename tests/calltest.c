@@ -61,10 +61,10 @@ int main(void)
     OPNAHandle* opna = OPNA_Create();
     printf(" OPNA_Create -> %p\n", (void*)opna);
     if (!opna) return fail("OPNA_Create returned NULL");
-    if (!OPNA_Init(opna, 8000000, 44100, 0, NULL)) return fail("OPNA_Init failed");
+    if (!OPNA_Init(opna, 8000000, 44100, 0, "./")) return fail("OPNA_Init failed");
     {
-        int ok = OPNA_LoadRhythmSample(opna, NULL);
-        printf(" OPNA_LoadRhythmSample(NULL) -> %d\n", ok);
+        int ok = OPNA_LoadRhythmSample(opna, "./");
+        printf(" OPNA_LoadRhythmSample(\"./\") -> %d\n", ok);
         if (!ok) {
             printf("  (info) Rhythm samples not found; continuing.\n");
         }
