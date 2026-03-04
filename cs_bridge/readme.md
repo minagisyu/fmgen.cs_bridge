@@ -17,7 +17,8 @@ Copyright (C) by cisc 1998, 2003.
 ### バージョン履歴
 - 0.8.19: 初期リリース、細かい調整やビルドパイプライン調整
 - 0.8.20: upstreamのfmgen更新を反映
-- 0.8.21: upstreamのFMgen更新を反映
+- 0.8.21: upstreamのfmgen更新を反映
+- 0.8.22: upstreamのfmgen更新を反映
 
 ### ライセンスについて
 - fmgenに関してはreadme-fmgen.txtに記載のライセンスに準じます
